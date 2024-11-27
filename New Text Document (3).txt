@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vehicle Upgrade Calculator</title>
+<style>
+body{font:14px Arial,sans-serif;margin:0}
+.container{max-width:100%;padding:10px;background:#fff;border-radius:5px;box-shadow:0 0 5px rgba(0,0,0,.1)}
+h1{font-size:18px;text-align:center;margin:10px 0;color:#333}
+.input-container{margin-bottom:10px}
+.input-container label{display:block;margin-bottom:5px;color:#0056b3;font-size:0.9em}
+.input-container input[type="number"],.input-container input[type="checkbox"]{width:calc(50% - 10px);padding:6px;border:1px solid #ccc;border-radius:4px;background:#e6f2ff}
+.input-container button{width:50%;padding:8px;background:#0056b3;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-top:10px}
+.result-container{padding:6px;background:#f9f9f9;border-radius:4px;box-shadow:0 0 3px rgba(0,0,0,.1);margin-bottom:10px}
+.upgrade-info{border:1px solid #ccc;border-radius:4px;padding:8px;margin-bottom:10px;font-size:0.9em}
+.blue-box{background:#0056b3;color:#fff;padding:2px 8px;border-radius:4px}
+.green-box,.red-box{background:#28a745;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;margin-right:5px}
+.red-box{background:#dc3545}
+.note{background:#28a745;color:#fff;padding:6px;border-radius:4px;margin-bottom:10px;text-align:right;font-size:0.9em}
+.column{float:left;width:50%}
+.row:after{content:"";display:table;clear:both}
+#additionalCosts{text-align:right;margin-top:10px}
+#additionalCosts .upgrade-info{display:inline-block;margin:0 5px;font-size:0.9em}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Vehicle Upgrade Calculator</h1>
+    <div class="input-container">
+        <label for="vehiclePrice">Vehicle Price:</label>
+        <input type="number" id="vehiclePrice" min="0" step="0.01" placeholder="Enter vehicle price">
+    </div>
+
+    <div class="input-container">
+        <label for="driftKit">Add Drift Kit:</label>
+        <input type="checkbox" id="driftKit">
+    </div>
+
+    <div class="input-container">
+        <label for="insuranceMonths">Insurance (Months):</label>
+        <input type="number" id="insuranceMonths" min="0" step="1" value="0" placeholder="Enter number of months">
+    </div>
+
+    <button onclick="calculateUpgradeCost()">Calculate</button>
+
+    <div class="note">Note: If chip tuning prices are 50% discounted, these prices are applicable.</div>
+
+    <div class="row">
+        <div class="column">
+            <div id="leftResults" class="result-container"></div>
+        </div>
+        <div class="column">
+            <div id="rightResults" class="result-container"></div>
+        </div>
+    </div>
+
+    <div id="additionalCosts" class="result-container"></div>
+
+</div>
+
+<script>
+function calculateUpgradeCost() {
+    var vehiclePrice = parseFloat(document.getElementById("vehiclePrice").value);
+    var driftKitPrice = document.getElementById("driftKit").checked ? vehiclePrice / 2 : 0;
+    var insuranceMonths = parseInt(document.getElementById("insuranceMonths").value);
+    if (isNaN(insuranceMonths)) insuranceMonths = 0;
+    var insurancePrice = vehiclePrice / 10 * insuranceMonths;
+
+    var upgradeCost = {};
+
+    upgradeCost.engineLv1 = (vehiclePrice / 10).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.engineLv2 = (vehiclePrice / 5).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.engineLv3 = (vehiclePrice / 3.3333333).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.engineLv4 = (vehiclePrice / 2.5).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+
+    upgradeCost.brakesLv1 = (vehiclePrice / 40).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.brakesLv2 = (vehiclePrice / 20).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.brakesLv3 = (vehiclePrice / 13.3333333).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    
+    upgradeCost.suspensionLv1 = (vehiclePrice / 66.6666666).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.suspensionLv2 = (vehiclePrice / 33.3333333).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.suspensionLv3 = (vehiclePrice / 22.2222222).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.suspensionLv4 = (vehiclePrice / 16.6666666).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+
+    upgradeCost.transmissionLv1 = (vehiclePrice / 50).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.transmissionLv2 = (vehiclePrice / 25).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    upgradeCost.transmissionLv3 = (vehiclePrice / 16.6666666).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+
+    var totalUpgradeCost = driftKitPrice + insurancePrice;
+    var engineTotalCost = 0;
+    var brakesTotalCost = 0;
+    var suspensionTotalCost = 0;
+    var transmissionTotalCost = 0;
+
+    for (var part in upgradeCost) {
+        totalUpgradeCost += parseFloat(upgradeCost[part].replace(/\$/, "").replace(/ /g, ""));
+        if (part.startsWith("engine")) engineTotalCost += parseFloat(upgradeCost[part].replace(/\$/, "").replace(/ /g, ""));
+        if (part.startsWith("brakes")) brakesTotalCost += parseFloat(upgradeCost[part].replace(/\$/, "").replace(/ /g, ""));
+        if (part.startsWith("suspension")) suspensionTotalCost += parseFloat(upgradeCost[part].replace(/\$/, "").replace(/ /g, ""));
+        if (part.startsWith("transmission")) transmissionTotalCost += parseFloat(upgradeCost[part].replace(/\$/, "").replace(/ /g, ""));
+    }
+
+    var resultElementLeft = document.getElementById("leftResults");
+    var resultElementRight = document.getElementById("rightResults");
+
+    resultElementLeft.innerHTML = "<div class='upgrade-info'><h3 class='blue-box'>Engine Upgrades</h3>";
+    resultElementLeft.innerHTML += "<p>Level 1: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.engineLv1 + "</span></p>";
+    resultElementLeft.innerHTML += "<p>Level 2: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.engineLv2 + "</span></p>";
+    resultElementLeft.innerHTML += "<p>Level 3: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.engineLv3 + "</span></p>";
+    resultElementLeft.innerHTML += "<p>Level 4: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.engineLv4 + "</span></p>";
+    resultElementLeft.innerHTML += "<p>Total Engine Upgrade Cost: <span class='green-box'>" + engineTotalCost.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $</span></div>";
+
+    resultElementRight.innerHTML = "<div class='upgrade-info'><h3 class='blue-box'>Brake Upgrades</h3>";
+    resultElementRight.innerHTML += "<p>Level 1: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.brakesLv1 + "</span></p>";
+    resultElementRight.innerHTML += "<p>Level 2: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.brakesLv2 + "</span></p>";
+    resultElementRight.innerHTML += "<p>Level 3: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.brakesLv3 + "</span></p>";
+    resultElementRight.innerHTML += "<p>Total Brake Upgrade Cost: <span class='green-box'>" + brakesTotalCost.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $</span></div>";
+
+    resultElementLeft.innerHTML += "<div class='upgrade-info'><h3 class='blue-box'>Suspension Upgrades</h3>";
+    resultElementLeft.innerHTML += "<p>Level 1: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.suspensionLv1 + "</span></p>";
+    resultElementLeft.innerHTML += "<p>Level 2: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.suspensionLv2 + "</span></p>";
+    resultElementLeft.innerHTML += "<p>Level 3: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.suspensionLv3 + "</span></p>";
+    resultElementLeft.innerHTML += "<p>Level 4: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.suspensionLv4 + "</span></p>";
+    resultElementLeft.innerHTML += "<p>Total Suspension Upgrade Cost: <span class='green-box'>" + suspensionTotalCost.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $</span></div>";
+
+    resultElementRight.innerHTML += "<div class='upgrade-info'><h3 class='blue-box'>Transmission Upgrades</h3>";
+    resultElementRight.innerHTML += "<p>Level 1: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.transmissionLv1 + "</span></p>";
+    resultElementRight.innerHTML += "<p>Level 2: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.transmissionLv2 + "</span></p>";
+    resultElementRight.innerHTML += "<p>Level 3: <span class='green-box' onclick='removeCost(this)'>" + upgradeCost.transmissionLv3 + "</span></p>";
+    resultElementRight.innerHTML += "<p>Total Transmission Upgrade Cost: <span class='green-box'>" + transmissionTotalCost.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $</span></div>";
+
+    var additionalCostsElement = document.getElementById("additionalCosts");
+    additionalCostsElement.innerHTML = "<div class='upgrade-info'><h3 class='blue-box'>Total Cost</h3>";
+
+    if (driftKitPrice > 0) {
+        additionalCostsElement.innerHTML += "<p>Drift Kit Cost: <span class='green-box' onclick='removeCost(this)'>" + driftKitPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $</span></p>";
+    }
+
+    if (insurancePrice > 0) {
+        additionalCostsElement.innerHTML += "<p>Insurance Cost: <span class='green-box' onclick='removeCost(this)'>" + insurancePrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $</span></p>";
+    }
+
+    additionalCostsElement.innerHTML += "<p>Total Upgrade Cost: <span class='green-box' id='totalUpgradeCost'>" + totalUpgradeCost.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $</span></div>";
+}
+
+function removeCost(element) {
+    var cost = parseFloat(element.textContent.replace(/\$/, "").replace(/ /g, ""));
+    var totalElement = document.getElementById("totalUpgradeCost");
+    var totalCost = parseFloat(totalElement.textContent.replace(/\$/, "").replace(/ /g, ""));
+    totalElement.textContent = (totalCost - cost).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    element.classList.add("remove-cost");
+    element.removeAttribute("onclick");
+    element.style.backgroundColor = "#dc3545";
+    element.onclick = function() { addCost(this); };
+}
+
+function addCost(element) {
+    var cost = parseFloat(element.textContent.replace(/\$/, "").replace(/ /g, ""));
+    var totalElement = document.getElementById("totalUpgradeCost");
+    var totalCost = parseFloat(totalElement.textContent.replace(/\$/, "").replace(/ /g, ""));
+    totalElement.textContent = (totalCost + cost).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
+    element.classList.remove("remove-cost");
+    element.style.backgroundColor = "#28a745";
+    element.onclick = function() { removeCost(this); };
+}
+</script>
+
+</body>
+</html>
